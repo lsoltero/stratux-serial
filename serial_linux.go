@@ -142,6 +142,17 @@ func (p *Port) Write(b []byte) (n int, err error) {
 	return p.f.Write(b)
 }
 
+func (p *Port) ClearRTS() error {
+	const TCCMBIC = 0x5417
+	_, _, err := unix.Syscall(
+		unix.SYS_IOCTL,
+		uintptr(p.f.Fd()),
+		uintptr(TCCMBIC),
+		uintptr(unix.TIOCM_RTS),
+	)
+	return err
+}
+
 // Discards data written to the port but not transmitted,
 // or data received but not read
 func (p *Port) Flush() error {
